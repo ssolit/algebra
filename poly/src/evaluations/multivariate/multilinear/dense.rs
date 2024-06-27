@@ -371,6 +371,14 @@ impl <'a, F: Field> MulAssign<&'a F> for DenseMultilinearExtension<F> {
     }
 }
 
+impl<F: Field> Mul<&DenseMultilinearExtension<F>> for &F {
+    type Output = DenseMultilinearExtension<F>;
+
+    fn mul(self, poly: &DenseMultilinearExtension<F>) -> Self::Output {
+        poly * self
+    }
+}
+
 impl<F: Field> fmt::Debug for DenseMultilinearExtension<F> {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), fmt::Error> {
         write!(f, "DenseML(nv = {}, evaluations = [", self.num_vars)?;
@@ -560,6 +568,7 @@ mod tests {
             }
             // test mul_assign for poly * scalar
             {
+                assert_eq!(&poly1 * &scalar, &scalar * &poly1);
                 let mut poly1_cloned = poly1.clone();
                 poly1_cloned *= Fr::one();
                 assert_eq!(poly1_cloned.evaluate(&point), v1);
